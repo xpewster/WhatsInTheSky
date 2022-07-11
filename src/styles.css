@@ -1,0 +1,26 @@
+body,
+html,
+#root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+body {
+    background: black;
+}
+
+h1 {
+    position: absolute;
+    top: 43px;
+    left: 140px;
+    margin: 0;
+    font-size: 5em;
+    font-weight: 600;
+    line-height: 0.7em;
+    letter-spacing: -6px;
+    color: peru;
+    z-index: 1;
+  }
+  
