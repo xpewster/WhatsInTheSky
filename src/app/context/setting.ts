@@ -2,8 +2,8 @@ import React, { Dispatch, SetStateAction, useContext } from "react";
 import { LocationType } from "../types/LocationType";
 
 export type SettingContextType = {
-    time: number;
-    setTime: Dispatch<SetStateAction<number>>;
+    time: Date;
+    setTime: Dispatch<SetStateAction<Date>>;
     location: LocationType;
     setLocation: Dispatch<SetStateAction<LocationType>>;
 }

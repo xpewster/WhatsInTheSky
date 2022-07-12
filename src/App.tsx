@@ -1,11 +1,11 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { SettingContext, SettingContextType } from "./app/context/setting";
 import { Loader } from "@react-three/drei";
-import { skyColor } from "./app/math/sky";
+import { getTimes, skyColor, sunriseset } from "./app/math/sky";
 
 
 
@@ -40,18 +40,18 @@ const CameraControls = () => {
     return null;
 }
 
-const Sky = () => {
+const Sky = ({ sunTimes }: {sunTimes: Date[]}) => {
     const ref = useRef<THREE.Color>(null!);
     //let background_color = new THREE.Color(0x2f0342);
     let background_color = new THREE.Color(0x704b80);
     
     const settingContext = useContext(SettingContext) as SettingContextType;
 
-    useFrame((state, delta) => {
-        background_color = skyColor(settingContext.time, settingContext.location);
+    useEffect(() => {
+        background_color = skyColor(settingContext.time, sunTimes);
         ref.current.set(background_color);
-    }
-    );
+    }, [settingContext.time, sunTimes]);
+
     return (
         <color 
             ref={ref}
@@ -63,17 +63,23 @@ const Sky = () => {
 
 
 const App = () => {
-    const [time, setTime] = React.useState(Date.now());
+    const [time, setTime] = React.useState(new Date());
     const [location, setLocation] = React.useState({latitude: 0, longitude: 0});
+    const [sunTimes, setSunTimes] = React.useState<Date[]>([]);
 
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
-            setLocation({latitude: position.coords.latitude, longitude: position.coords.longitude});
-        })
-    } else {
-        setLocation({latitude: 30.86265, longitude: -98.82478}); // my spot :)
-    }
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
+                setLocation({latitude: position.coords.latitude, longitude: position.coords.longitude});
+            })
+        } else {
+            setLocation({latitude: 30.86265, longitude: -98.82478}); // my spot :)
+        }
+    }, []);
 
+    useEffect(() => {
+        setSunTimes(getTimes(time, location.latitude, location.longitude));
+    }, [location])
 
     return (
         <>
@@ -81,7 +87,7 @@ const App = () => {
             <Canvas>
             <CameraControls />
             <SettingContext.Provider value={{time, setTime, location, setLocation}}>
-                <Sky />
+                <Sky sunTimes={sunTimes}/>
             </SettingContext.Provider> 
             <ambientLight />
             <pointLight position={[10, 10, 10]} />
