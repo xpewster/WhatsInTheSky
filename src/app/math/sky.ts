@@ -4,6 +4,62 @@ import { Time } from '../types/TimeType';
 const SunCalc = require('suncalc');
 
 
+export const sunColor = (time: Date, times: Date[]): THREE.Color => {
+    const timeOfDay = time.getTime();
+    let dawn = times[Time.AT_Rise].getTime();
+    const dusk = times[Time.Night].getTime();
+    
+    let sunrise = times[Time.Sunrise].getTime();
+    const sunset = times[Time.Sunset].getTime();
+    
+
+    let r, g, b;
+    if (timeOfDay <= sunset && timeOfDay >= sunrise) {
+        r = 255;
+        g = 255;
+        b = 240;
+    } else if (timeOfDay > sunset) {
+        if (timeOfDay <= dusk) {
+            const sunsetLength = dusk-sunset;
+            const d = (timeOfDay-sunset)/sunsetLength;
+            r = 255;
+            g = 255-(d*255);
+            b = 240;
+            g *= 1-d;
+            b *= 1-d*4;
+            if (b < 0) {
+                b = 0;
+            }
+        } else {
+            r = 255;
+            g = 0;
+            b = 0;
+        }  
+    } else {
+        if (timeOfDay >= dawn) {
+            const sunriseLength = sunrise-dawn;
+            const d = (timeOfDay-dawn)/sunriseLength;
+            r = 255;
+            g = d*255;
+            b = 240;
+            g *= d;
+            b *= d*4;
+            if (b > 255) {
+                b = 255;
+            }
+        } else {
+            r = 255;
+            g = 0;
+            b = 0;
+        }
+    }
+
+    // console.log("timeOfDay="+(timeOfDay%86400000)/3600000+" sunrise="+(sunrise%86400000)/3600000+" sunset="+(sunset%86400000)/3600000);
+    // console.log("r="+r+" g="+g+" b="+b);
+
+    return new THREE.Color(r/255, g/255, b/255);
+}
+
 export const skyColor = (time: Date, times: Date[]): THREE.Color => {
     const timeOfDay = time.getTime();
     let dawn = times[Time.AT_Rise].getTime();
@@ -25,13 +81,13 @@ export const skyColor = (time: Date, times: Date[]): THREE.Color => {
             r = 143;
             g = 255-(d*255);
             b = 255;
-            r *= 1-.6*d;
-            g *= 1-.6*d;
-            b *= 1-.6*d;
+            r *= 1-.7*d;
+            g *= 1-.7*d;
+            b *= 1-.7*d;
         } else {
-            r = 143*.4;
+            r = 143*.3;
             g = 0;
-            b = 255*.4;
+            b = 255*.3;
         }  
     } else {
         if (timeOfDay >= dawn) {
@@ -40,13 +96,13 @@ export const skyColor = (time: Date, times: Date[]): THREE.Color => {
             r = 143;
             g = d*255;
             b = 255;
-            r *= .4+.6*d;
-            g *= .4+.6*d;
-            b *= .4+.6*d;
+            r *= .4+.7*d;
+            g *= .4+.7*d;
+            b *= .4+.7*d;
         } else {
-            r = 143*.4;
+            r = 143*.3;
             g = 0;
-            b = 255*.4;
+            b = 255*.3;
         }
     }
 
